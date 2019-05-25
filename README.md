@@ -3,7 +3,7 @@ elasticsearch log golang 的elasticsearch
 
 Log encapsulation, including search, query, add, etc.
 
-[本文中文版](README_zh-CN.md)
+[中文版](README_zh-CN.md)
 
 # elasticsearch Log Encapsulation Types
 
