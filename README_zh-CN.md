@@ -1,20 +1,17 @@
 # esLog
-elasticsearch log golang 的elasticsearch 
+elasticsearch log golang 的elasticsearch 日志封装，包括搜索，查询，添加等
 
-Log encapsulation, including search, query, add, etc.
+# elasticsearch 的日志封装类型
 
-[本文中文版](README_zh-CN.md)
-
-# elasticsearch Log Encapsulation Types
-
-- install
+[English](README_zh-CN.md)
+- 安装
 
 ```
  go get gopkg.in/olivere/elastic.v5
 
 ```
 
-- init 
+- 初始化 
   
 ```go 
 	es.Url = "http://192.168.198.17:9200/"
@@ -22,8 +19,7 @@ Log encapsulation, including search, query, add, etc.
 
 	e := es.GetClient()
 ```
-
-- add
+- 添加
 
 ```go
 	es.Url = "http://192.168.198.17:9200/"
@@ -39,25 +35,26 @@ Log encapsulation, including search, query, add, etc.
 		fmt.Println(e.Err)
 	}
 ```
-- search
+- 搜索
 
 ```go
 es.Url = "http://192.168.198.17:9200/"
 es.Index = "wms_log"
     
-//Precise search
+//精确搜索
 term := make(map[string]interface{})
 ...
-//Fuzzy matching
+//模糊匹配
 match := make(map[string]interface{})
 ...
-//Time Search
+//时间段搜索
 timeCase := make(map[string]es.CaseSection)
 ...
 
 eslist := tools.Search(term, match, timeCase, req.Page, req.Limit)
 
 ```
-- case
 
-if inmprt github.com/olivere/elastic must remove *hit.Source on *
+- 注意
+
+如果 inmprt github.com/olivere/elastic 需要去掉 *hit.Source 的 *

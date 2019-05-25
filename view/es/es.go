@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"time"
-
+	//"github.com/olivere/elastic"
 	"gopkg.in/olivere/elastic.v5"
 )
 
@@ -324,7 +324,7 @@ func (es *MyElastic) Search(index_name, type_name string, query interface{}, f f
 	}
 
 	for _, hit := range es_result.Hits.Hits {
-		f(*hit.Source)
+		f(*hit.Source) //如果 inmprt github.com/olivere/elastic 需要去掉 *
 	}
 
 	return true

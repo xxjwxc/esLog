@@ -16,7 +16,7 @@ type Logger struct {
 //添加一个日志
 func (s *Logger) AddLog() {
 	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "ezbuy_wms_log"
+	es.Index = "wms_log"
 
 	e := es.GetClient()
 
@@ -46,7 +46,7 @@ func (s *Logger) AddLog() {
 //搜索日志
 func (s *Logger) Search() {
 	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "ezbuy_wms_log"
+	es.Index = "wms_log"
 
 	//精确搜索
 	term := make(map[string]interface{})
