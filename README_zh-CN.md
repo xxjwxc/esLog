@@ -58,3 +58,6 @@ eslist := tools.Search(term, match, timeCase, req.Page, req.Limit)
 - 注意
 
 如果 import github.com/olivere/elastic 需要去掉 *hit.Source 的 *
+
+- 详细文档
+[详细说明](https://xie1xiao1jun.github.io/post/loglistdef/)
