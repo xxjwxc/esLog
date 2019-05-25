@@ -57,4 +57,4 @@ eslist := tools.Search(term, match, timeCase, req.Page, req.Limit)
 
 - 注意
 
-如果 inmprt github.com/olivere/elastic 需要去掉 *hit.Source 的 *
+如果 import github.com/olivere/elastic 需要去掉 *hit.Source 的 *

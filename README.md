@@ -60,4 +60,4 @@ eslist := tools.Search(term, match, timeCase, req.Page, req.Limit)
 ```
 - case
 
-if inmprt github.com/olivere/elastic must remove *hit.Source on *
+if import github.com/olivere/elastic must remove *hit.Source on *
