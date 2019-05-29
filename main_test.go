@@ -1,8 +1,12 @@
 package main
 
-import "github.com/xie1xiao1jun/esLog/logger"
+import (
+	"testing"
 
-func TestMain() {
+	"github.com/xie1xiao1jun/esLog/logger"
+)
+
+func TestMain(m *testing.M) {
 	var log logger.Logger
 	log.AddLog()
 	log.Search()

@@ -3,16 +3,16 @@ package es
 type EsQuery struct {
 	//qmp       map[string]interface{}
 	much_term []interface{}
-	page      int32
+	offset    int32
 	limit     int32
 }
 
-func (q *EsQuery) OnPages(page, limit int32) *EsQuery {
-	q.page = page
+func (q *EsQuery) OnPages(offset, limit int32) *EsQuery {
+	q.offset = offset
 	q.limit = limit
 
-	if q.page < 0 {
-		q.page = 0
+	if q.offset < 0 {
+		q.offset = 0
 	}
 	if q.limit <= 0 {
 		q.limit = 1
@@ -78,7 +78,7 @@ func (q *EsQuery) OnSource() map[string]interface{} {
 
 	if len(q.much_term) == 0 {
 		return map[string]interface{}{
-			"from":       q.limit * q.page,
+			"from":       q.offset,
 			"size":       q.limit,
 			"creat_time": "desc", //默认时间降序
 		}
@@ -90,7 +90,7 @@ func (q *EsQuery) OnSource() map[string]interface{} {
 				"must": q.much_term,
 			},
 		},
-		"from": q.limit * q.page,
+		"from": q.offset,
 		"size": q.limit,
 		"sort": map[string]interface{}{
 			"creat_time": "desc",

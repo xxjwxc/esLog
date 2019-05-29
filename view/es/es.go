@@ -303,7 +303,7 @@ type_name
 query interface{} //查询条件
 out *[]Param //查询结果
 */
-func (es *MyElastic) Search(index_name, type_name string, query interface{}, f func(e []byte) error) (result bool) {
+func (es *MyElastic) Search(index_name, type_name string, query interface{}, f func(e []byte) error) (total int64, result bool) {
 
 	es_search := es.Client.Search()
 	if len(type_name) > 0 {
@@ -316,16 +316,16 @@ func (es *MyElastic) Search(index_name, type_name string, query interface{}, f f
 	es_result, es.Err = es_search.Source(query).Do(es.Ctx)
 	if es.Err != nil {
 		log.Println(es.Err)
-		return false
+		return 0, false
 	}
 	if es_result.Hits == nil {
 		log.Println(errors.New("expected SearchResult.Hits != nil; got nil"))
-		return false
+		return 0, false
 	}
 
 	for _, hit := range es_result.Hits.Hits {
 		f(*hit.Source) //如果 inmprt github.com/olivere/elastic 需要去掉 *
 	}
 
-	return true
+	return es_result.TotalHits(), true
 }
