@@ -61,4 +61,4 @@ eslist := tools.Search(term, match, timeCase, req.Page, req.Limit)
 
 - 详细文档
 
-[详细说明](https://xie1xiao1jun.github.io/post/loglistdef/)
+[详细说明](https://xxjwxc.github.io/post/loglistdef/)

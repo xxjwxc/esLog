@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/xie1xiao1jun/esLog/logger"
+	"github.com/xxjwxc/esLog/logger"
 )
 
 func TestMain(m *testing.M) {

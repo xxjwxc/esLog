@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/xie1xiao1jun/esLog/view/es"
-	"github.com/xie1xiao1jun/esLog/view/oplogger"
+	"github.com/xxjwxc/esLog/view/es"
+	"github.com/xxjwxc/esLog/view/oplogger"
 )
 
 type Logger struct {
