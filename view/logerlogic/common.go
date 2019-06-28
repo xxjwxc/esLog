@@ -1,8 +1,9 @@
 package logerlogic
 
 import (
-	"errors"
 	"time"
+
+	"github.com/xxjwxc/public/errors"
 
 	"git.ezbuy.me/ezbuy/base/misc/context"
 	"git.ezbuy.me/ezbuy/oplogger/rpc/oplogger"

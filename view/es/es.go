@@ -3,10 +3,11 @@ package es
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/xxjwxc/public/errors"
 
 	"time"
 	//"github.com/olivere/elastic"
