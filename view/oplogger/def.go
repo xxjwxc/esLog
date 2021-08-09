@@ -1,6 +1,8 @@
 package oplogger
 
-import "github.com/golang/protobuf/proto"
+import (
+	"github.com/golang/protobuf/proto"
+)
 
 type EOpType int32
 
@@ -92,4 +94,25 @@ var ELogLevel_value = map[string]int32{
 
 func (x ELogLevel) String() string {
 	return proto.EnumName(ELogLevel_name, int32(x))
+}
+
+type LogerInfo struct {
+	//应用/服务的标识： 用来确定日志产生的应用服务器的唯一标识(可以细分)
+	Topic string `json:"topic"`
+	//业务唯一标识
+	EType EOpType `json:"etype"`
+	//用户信息
+	UserName string `json:"user_name"`
+	//关键值
+	Ekey string `json:"ekey"`
+	//事件等级
+	ELevel ELogLevel `json:"elevel"`
+	//备注
+	Desc string `json:"desc"`
+
+	//附加字段
+	Attach string `json:"attach"`
+
+	//创建时间
+	CreatTime int64 `json:"creat_time"`
 }

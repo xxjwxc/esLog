@@ -5,9 +5,8 @@ import (
 	"log"
 	"time"
 
-	"git.ezbuy.me/ezbuy/oplogger/config"
-	"git.ezbuy.me/ezbuy/oplogger/rpc/oplogger"
-	"git.ezbuy.me/ezbuy/oplogger/service/view/es"
+	"github.com/xxjwxc/esLog/view/es"
+	"github.com/xxjwxc/esLog/view/oplogger"
 )
 
 //req请求类型转es日志
@@ -49,7 +48,7 @@ func ConvertESLogS2Re(req []es.ESLog) []*oplogger.LogerInfo {
 }
 
 //搜索并返回
-func Search(term map[string]interface{}, match map[string]interface{}, timeCase map[string]es.CaseSection, page, limit int32) []es.ESLog {
+func Search(index_name, type_name string, term map[string]interface{}, match map[string]interface{}, timeCase map[string]es.CaseSection, page, limit int32) []es.ESLog {
 
 	//构造搜索器
 	var que es.EsQuery
@@ -59,7 +58,7 @@ func Search(term map[string]interface{}, match map[string]interface{}, timeCase 
 
 	client := es.GetClient()
 	var eslog []es.ESLog
-	client.Search(config.Config.ElasticSearch.Index, config.Config.ElasticSearch.Index,
+	client.Search(index_name, type_name,
 		que.OnSource(), func(e []byte) error {
 			var tmp es.ESLog
 			err := json.Unmarshal(e, &tmp)

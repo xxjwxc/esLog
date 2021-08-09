@@ -3,15 +3,15 @@ package es
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"sync"
 
-	"github.com/xxjwxc/public/errors"
-
 	"time"
-	//"github.com/olivere/elastic"
-	"gopkg.in/olivere/elastic.v5"
+
+	"github.com/olivere/elastic"
+	//"gopkg.in/olivere/elastic.v5"
 )
 
 var Url string

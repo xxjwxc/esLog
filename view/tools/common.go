@@ -3,14 +3,14 @@ package tools
 import (
 	"strconv"
 
-	"git.ezbuy.me/ezbuy/oplogger/rpc/oplogger"
+	"github.com/xxjwxc/esLog/view/oplogger"
 )
 
 //参数判空
 func IsEmpty(req []*oplogger.LogerInfo) bool {
 	for _, v := range req {
 		if CheckParam(v.Topic, v.UserName, v.Ekey, v.Desc, v.Attach) ||
-			v.EType.GetValue() != 0 || v.ELevel.GetValue() != 0 || v.CreatTime != 0 {
+			v.EType != oplogger.EOpType_EOpDefault || v.ELevel != oplogger.ELogLevel_EDefault || v.CreatTime != 0 {
 			return false
 		}
 	}

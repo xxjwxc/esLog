@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/olivere/elastic"
 	"github.com/xxjwxc/esLog/view/oplogger"
-	//"github.com/olivere/elastic"
-	"gopkg.in/olivere/elastic.v5"
+	// "gopkg.in/olivere/elastic.v5"
 )
 
 var esc *MyElastic

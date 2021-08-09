@@ -1,6 +1,6 @@
 package logerlogic
 
-import "git.ezbuy.me/ezbuy/oplogger/rpc/oplogger"
+import "github.com/xxjwxc/esLog/view/oplogger"
 
 ////////////////////////////////////////////////////////////////////////////
 ///

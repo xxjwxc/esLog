@@ -3,10 +3,7 @@ package logerlogic
 import (
 	"time"
 
-	"github.com/xxjwxc/public/errors"
-
-	"git.ezbuy.me/ezbuy/base/misc/context"
-	"git.ezbuy.me/ezbuy/oplogger/rpc/oplogger"
+	"github.com/xxjwxc/esLog/view/oplogger"
 )
 
 type LogerInfo struct {
@@ -69,15 +66,15 @@ func (l *LogerBase) Add(info *oplogger.LogerInfo) {
 ////////////////////////////////////////////////////////////////////////////
 
 // 添加日志到日志中心
-func OnAddLogOplogger(ctx context.T, info ILogerTrimAdd) error {
-	tmp := info.GetListParms()
-	if len(tmp) == 0 {
-		return ctx.Trace(errors.New("参数为空"))
-	}
+// func OnAddLogOplogger(ctx context.T, info ILogerTrimAdd) error {
+// 	tmp := info.GetListParms()
+// 	if len(tmp) == 0 {
+// 		return ctx.Trace(errors.New("参数为空"))
+// 	}
 
-	go func() {
-		oplogger.GetLogger().AddLog(ctx, &oplogger.AddLogReq{Info: tmp})
-	}()
+// 	go func() {
+// 		oplogger.GetLogger().AddLog(ctx, &oplogger.AddLogReq{Info: tmp})
+// 	}()
 
-	return nil
-}
+// 	return nil
+// }

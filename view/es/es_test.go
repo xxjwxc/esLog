@@ -7,14 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"git.ezbuy.me/ezbuy/oplogger/rpc/oplogger"
-
-	"git.ezbuy.me/ezbuy/oplogger/config"
+	"github.com/xxjwxc/esLog/view/oplogger"
 )
 
 func TestEsAdd(m *testing.T) {
-	config.Config.ElasticSearch.Url = "http://192.168.198.17:9200/"
-	config.Config.ElasticSearch.Index = "ezbuy_wms_log"
+	//Url := "http://192.168.198.17:9200/"
+	Index := "ezbuy_wms_log"
 
 	es := GetClient()
 
@@ -35,8 +33,7 @@ func TestEsAdd(m *testing.T) {
 		tmp = append(tmp, eslog)
 	}
 
-	b := es.BulkAdd(config.Config.ElasticSearch.Index,
-		config.Config.ElasticSearch.Index, "", tmp)
+	b := es.BulkAdd(Index, Index, "", tmp)
 	if !b {
 		fmt.Println(es.Err)
 	}
@@ -49,9 +46,8 @@ func TestEsAdd(m *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-
-	config.Config.ElasticSearch.Url = "http://192.168.198.17:9200/"
-	config.Config.ElasticSearch.Index = "ezbuy_wms_log"
+	// Url := "http://192.168.198.17:9200/"
+	Index := "ezbuy_wms_log"
 
 	es := GetClient()
 
@@ -117,17 +113,16 @@ func TestSearch(t *testing.T) {
 	//query := elastic.NewSearchSource().Query(elastic.NewMatchAllQuery()).From(0).Size(1)
 	//`{"query":{"match_all":{}}}`
 	var eslog []ESLog
-	es.Search(config.Config.ElasticSearch.Index,
-		config.Config.ElasticSearch.Index, source, func(e []byte) error {
-			var tmp ESLog
-			err := json.Unmarshal(e, &tmp)
-			if err != nil {
-				log.Println(err)
-			} else {
-				eslog = append(eslog, tmp)
-			}
-			return err
-		})
+	es.Search(Index, Index, source, func(e []byte) error {
+		var tmp ESLog
+		err := json.Unmarshal(e, &tmp)
+		if err != nil {
+			log.Println(err)
+		} else {
+			eslog = append(eslog, tmp)
+		}
+		return err
+	})
 
 	for _, v := range eslog {
 		fmt.Println(v.CreatTime)
@@ -137,8 +132,8 @@ func TestSearch(t *testing.T) {
 }
 
 func TestSearchObj(t *testing.T) {
-	config.Config.ElasticSearch.Url = "http://192.168.198.17:9200/"
-	config.Config.ElasticSearch.Index = "ezbuy_wms_log"
+	// Url := "http://192.168.198.17:9200/"
+	Index := "ezbuy_wms_log"
 
 	parm := make(map[string]interface{})
 	parm["itype"] = 666
@@ -157,17 +152,16 @@ func TestSearchObj(t *testing.T) {
 
 	es := GetClient()
 	var eslog []ESLog
-	es.Search(config.Config.ElasticSearch.Index,
-		config.Config.ElasticSearch.Index, que.OnSource(), func(e []byte) error {
-			var tmp ESLog
-			err := json.Unmarshal(e, &tmp)
-			if err != nil {
-				log.Println(err)
-			} else {
-				eslog = append(eslog, tmp)
-			}
-			return err
-		})
+	es.Search(Index, Index, que.OnSource(), func(e []byte) error {
+		var tmp ESLog
+		err := json.Unmarshal(e, &tmp)
+		if err != nil {
+			log.Println(err)
+		} else {
+			eslog = append(eslog, tmp)
+		}
+		return err
+	})
 
 	for _, v := range eslog {
 		fmt.Println(v.CreatTime)
@@ -177,8 +171,8 @@ func TestSearchObj(t *testing.T) {
 }
 
 func TestTrackingOpLoger(t *testing.T) {
-	config.Config.ElasticSearch.Url = "http://192.168.198.17:9200/"
-	config.Config.ElasticSearch.Index = "ezbuy_wms_log"
+	// Url := "http://192.168.198.17:9200/"
+	Index := "ezbuy_wms_log"
 
 	//精确搜索
 	term := make(map[string]interface{})
@@ -206,7 +200,7 @@ func TestTrackingOpLoger(t *testing.T) {
 
 	client := GetClient()
 	var eslog []ESLog
-	client.Search(config.Config.ElasticSearch.Index, config.Config.ElasticSearch.Index,
+	client.Search(Index, Index,
 		que.OnSource(), func(e []byte) error {
 			var tmp ESLog
 			err := json.Unmarshal(e, &tmp)
