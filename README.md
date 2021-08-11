@@ -17,19 +17,13 @@ Log encapsulation, including search, query, add, etc.
 - init 
   
 ```go 
-	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "wms_log"
-
-	e := es.GetClient()
+	e,err := New(WithIndexName("wms_log"), WithAddrs("http://192.168.198.17:9200/"))
 ```
 
 - add
 
 ```go
-	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "wms_log"
-
-	e := es.GetClient()
+	e,err := New(WithIndexName("wms_log"), WithAddrs("http://192.168.198.17:9200/"))
 
 	var eslog es.ESLog
     ...
@@ -42,9 +36,6 @@ Log encapsulation, including search, query, add, etc.
 - search
 
 ```go
-es.Url = "http://192.168.198.17:9200/"
-es.Index = "wms_log"
-    
 //Precise search
 term := make(map[string]interface{})
 ...

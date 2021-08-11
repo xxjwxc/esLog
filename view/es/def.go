@@ -1,13 +1,12 @@
 package es
 
 import (
-	"context"
 	"sync"
 	"time"
 
-	"github.com/olivere/elastic"
+	// "github.com/olivere/elastic"
+
 	"github.com/xxjwxc/esLog/view/oplogger"
-	// "gopkg.in/olivere/elastic.v5"
 )
 
 var esc *MyElastic
@@ -15,13 +14,6 @@ var once sync.Once
 
 const retry = 3 //链接重试次数
 //const PAGE_MAX_NUM = 10 //每页显示数据量
-
-//
-type MyElastic struct {
-	Client *elastic.Client
-	Err    error
-	Ctx    context.Context
-}
 
 type ESLog struct {
 	//应用/服务的标识： 用来确定日志产生的应用服务器的唯一标识(可以细分)

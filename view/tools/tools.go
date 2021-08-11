@@ -56,19 +56,18 @@ func Search(index_name, type_name string, term map[string]interface{}, match map
 	// data1, _ := json.Marshal(que.OnSource())
 	// fmt.Println(string(data1))
 
-	client := es.GetClient()
+	client, _ := es.New()
 	var eslog []es.ESLog
-	client.Search(index_name, type_name,
-		que.OnSource(), func(e []byte) error {
-			var tmp es.ESLog
-			err := json.Unmarshal(e, &tmp)
-			if err != nil {
-				log.Println(err)
-			} else {
-				eslog = append(eslog, tmp)
-			}
-			return err
-		})
+	client.WithOption(es.WithIndexName(index_name), es.WithTypeName(type_name)).Search(que.OnSource(), func(e []byte) error {
+		var tmp es.ESLog
+		err := json.Unmarshal(e, &tmp)
+		if err != nil {
+			log.Println(err)
+		} else {
+			eslog = append(eslog, tmp)
+		}
+		return err
+	})
 
 	return eslog
 }

@@ -14,23 +14,17 @@ elasticsearch log golang 的elasticsearch 日志封装，包括搜索，查询�
 - 初始化 
   
 ```go 
-	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "wms_log"
-
-	e := es.GetClient()
+	e,err := New(WithIndexName("wms_log"), WithAddrs("http://192.168.198.17:9200/"))
 ```
 - 添加
 
 ```go
-	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "wms_log"
-
-	e := es.GetClient()
+	e,_ := New(WithIndexName("wms_log"), WithAddrs("http://192.168.198.17:9200/"))
 
 	var eslog es.ESLog
     ...
 
-	b := e.Add(es.Index, es.Index, "", eslog)
+	b := e.Add(eslog)
 	if !b {
 		fmt.Println(e.Err)
 	}
@@ -38,9 +32,7 @@ elasticsearch log golang 的elasticsearch 日志封装，包括搜索，查询�
 - 搜索
 
 ```go
-es.Url = "http://192.168.198.17:9200/"
-es.Index = "wms_log"
-    
+
 //精确搜索
 term := make(map[string]interface{})
 ...

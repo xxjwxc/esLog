@@ -4,56 +4,41 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
-	"net/http"
-	"sync"
 
 	"time"
 
-	"github.com/olivere/elastic"
+	"github.com/olivere/elastic/v7"
+	"github.com/xxjwxc/public/mylog"
+	//"github.com/olivere/elastic"
 	//"gopkg.in/olivere/elastic.v5"
 )
 
-var Url string
-var Index string
-
-//
-func GetClient() *MyElastic {
-	once.Do(func() {
-		cli, err := NewClient(4*time.Second, 2)
-		if err != nil {
-			log.Println("EsClient create error :", err)
-			once = sync.Once{} //重入
-		} else {
-			esc = new(MyElastic)
-			esc.Client = cli
-			esc.Ctx = context.Background()
-			esc.CreateIndex(Index, mapping)
-		}
-	})
-
-	return esc
+// MyElastic elastic tools (操作工具)
+type MyElastic struct {
+	client *elastic.Client
+	ops    options
 }
 
-//
-func NewClient(timeout time.Duration, retries int) (*elastic.Client, error) {
-	var cli *elastic.Client
-	var err error
-
-	httpClient := &http.Client{
-		Timeout: timeout,
+// New 新建es
+func New(opts ...Option) (*MyElastic, error) {
+	es := &MyElastic{
+		ops: options{ // default option
+			retries: 2,
+			timeout: 4 * time.Second,
+			ctx:     context.Background(),
+		},
+	}
+	for _, o := range opts {
+		o.apply(&es.ops)
 	}
 
-	for i := 0; i < retry; i++ {
-		cli, err = elastic.NewClient(elastic.SetSniff(false), elastic.SetURL(Url), elastic.SetHttpClient(httpClient), elastic.SetMaxRetries(retries))
-		if err == nil {
-			break
-		}
-		log.Println("EsClient create failed ", err, ", tried %d time(s)", i+1)
-		time.Sleep(100 * time.Millisecond)
+	err := es.newClient()
+	if err != nil {
+		return nil, err
 	}
+	es.CreateIndex(mapping)
 
-	return cli, err
+	return es, nil
 }
 
 //
@@ -70,45 +55,52 @@ func NewClient(timeout time.Duration, retries int) (*elastic.Client, error) {
 // 	return es
 // }
 
-/*
-创建索引（相当于数据库）
-mapping 如果为空("")则表示不创建模型
-*/
-func (es *MyElastic) CreateIndex(index_name, mapping string) (result bool) {
-	es.Err = nil
-	exists, err := es.Client.IndexExists(index_name).Do(es.Ctx)
+// GetClient 获取es client
+func (es *MyElastic) GetClient() *elastic.Client {
+	return es.client
+}
+
+// GetClient 动态设置option
+func (es *MyElastic) WithOption(opts ...Option) *MyElastic {
+	for _, o := range opts {
+		o.apply(&es.ops)
+	}
+
+	return es
+}
+
+// CreateIndex 创建索引（相当于数据库）.mapping 如果为空("")则表示不创建模型
+func (es *MyElastic) CreateIndex(mapping string) error {
+	exists, err := es.client.IndexExists(es.ops.indexName).Do(es.ops.ctx)
 	if err != nil {
-		es.Err = err
-		log.Println(es.Err)
-		return false
+		mylog.Error(err)
+		return err
 	}
 
 	if !exists {
 		var re *elastic.IndicesCreateResult
 		if len(mapping) == 0 {
-			re, es.Err = es.Client.CreateIndex(index_name).Do(es.Ctx)
+			re, err = es.client.CreateIndex(es.ops.indexName).Do(es.ops.ctx)
 		} else {
-			re, es.Err = es.Client.CreateIndex(index_name).BodyString(mapping).Do(es.Ctx)
+			re, err = es.client.CreateIndex(es.ops.indexName).BodyString(mapping).Do(es.ops.ctx)
 		}
 
-		if es.Err != nil {
-			log.Println(es.Err)
-			return false
+		if err != nil {
+			mylog.Error(err)
+			return err
 		}
 
-		return re.Acknowledged
+		if re.Acknowledged {
+			return nil
+		}
 	}
 
-	return false
+	return nil
 }
 
-/*
-	排序查询
-	返回json数据集合
-*/
-func (es *MyElastic) SortQuery(index_name string, builder []elastic.Sorter, query []elastic.Query) (bool, []string) {
-
-	searchResult := es.Client.Search().Index(index_name)
+// SortQuery 排序查询,返回json数据集合
+func (es *MyElastic) SortQuery(builder []elastic.Sorter, query []elastic.Query) ([]string, error) {
+	searchResult := es.client.Search().Index(es.ops.indexName)
 
 	if len(builder) > 0 {
 		for _, v := range builder {
@@ -120,40 +112,28 @@ func (es *MyElastic) SortQuery(index_name string, builder []elastic.Sorter, quer
 			searchResult = searchResult.Query(v)
 		}
 	}
-	_, err := searchResult.Do(es.Ctx) // execute
+	es_result, err := searchResult.Do(es.ops.ctx) // execute
 	if err != nil {
-		log.Println(es.Err)
-		return false, nil
+		mylog.Error(err)
+		return nil, err
 	}
 	//log.Println("Found a total of %d entity\n", es_result.TotalHits())
 
-	// if es_result.Hits.TotalHits > 0 {
-	// 	var result []string
-	// 	//log.Println("Found a total of %d entity\n", searchResult.Hits.TotalHits)
-	// 	for _, hit := range es_result.Hits.Hits {
+	if len(es_result.Hits.Hits) > 0 {
+		var result []string
+		//log.Println("Found a total of %d entity\n", searchResult.Hits.TotalHits)
+		for _, hit := range es_result.Hits.Hits {
+			result = append(result, string(hit.Source))
+		}
+		return result, nil
+	}
 
-	// 		result = append(result, string(*hit.Source))
-
-	// 	}
-	// 	return true, result
-	// } else {
-	// 	// No hits
-	// 	return true, nil
-	// }
-	return true, nil
+	return nil, nil
 }
 
-/*
-   排序查询
-   返回原始Hit
-   builder：排序
-   agg：聚合 类似group_by sum
-   query：查询
-*/
-func (es *MyElastic) SortQueryReturnHits(index_name string, from, size int, builder []elastic.Sorter, query []elastic.Query) (bool, []*elastic.SearchHit) {
-
-	searchResult := es.Client.Search().Index(index_name)
-
+// SortQueryReturnHits  排序查询  返回原始Hit(builder：排序 agg：聚合 类似group_by sum,query：查询)
+func (es *MyElastic) SortQueryReturnHits(from, size int, builder []elastic.Sorter, query []elastic.Query) ([]*elastic.SearchHit, error) {
+	searchResult := es.client.Search().Index(es.ops.indexName)
 	if len(builder) > 0 {
 		for _, v := range builder {
 			searchResult = searchResult.SortBy(v)
@@ -168,165 +148,140 @@ func (es *MyElastic) SortQueryReturnHits(index_name string, from, size int, buil
 		searchResult = searchResult.From(from)
 		searchResult = searchResult.Size(size)
 	}
-	_, err := searchResult.Do(es.Ctx) // execute
+	esResult, err := searchResult.Do(es.ops.ctx) // execute
 	if err != nil {
-		log.Println(es.Err)
-		return false, nil
+		mylog.Error(err)
+		return nil, err
 	}
 
 	//	log.Println("wwwwww", es_result.Aggregations)
-	// if es_result.Hits.TotalHits > 0 {
+	if len(esResult.Hits.Hits) > 0 {
+		return esResult.Hits.Hits, nil
+	}
 
-	// 	return true, es_result.Hits.Hits
-	// } else {
-
-	// 	return true, nil
-	// }
-
-	return true, nil
+	return []*elastic.SearchHit{}, nil
 }
 
-/*
-添加记录,覆盖添加
-*/
-func (es *MyElastic) Add(index_name, type_name, id string, data interface{}) (result bool) {
-	result = false
+// Add 添加记录,覆盖添加
+func (es *MyElastic) Add(data interface{}, id ...string) (err error) {
 	// Index a tweet (using JSON serialization)
 	if len(id) > 0 {
-		_, es.Err = es.Client.Index().
-			Index(index_name).
-			Type(type_name).
-			Id(id).
+		_, err = es.client.Index().
+			Index(es.ops.indexName).
+			Type(es.ops.typeName).
+			Id(id[0]).
 			BodyJson(data).
-			Do(es.Ctx)
+			Do(es.ops.ctx)
 	} else {
-		_, es.Err = es.Client.Index().
-			Index(index_name).
-			Type(type_name).
+		_, err = es.client.Index().
+			Index(es.ops.indexName).
+			Type(es.ops.typeName).
 			BodyJson(data).
-			Do(es.Ctx)
+			Do(es.ops.ctx)
 	}
 
-	if es.Err != nil {
-		log.Println(es.Err)
-		return false
+	if err != nil {
+		mylog.Error(err)
+		return err
 	}
-	_, es.Err = es.Client.Flush().Index(index_name).Do(es.Ctx)
-	if es.Err != nil {
-		log.Println(es.Err)
-		return false
+	_, err = es.client.Flush().Index(es.ops.indexName).Do(es.ops.ctx)
+	if err != nil {
+		mylog.Error(err)
+		return err
 	}
-	return true
+	return nil
 }
 
-/*
- 批量新增
-*/
-func (es *MyElastic) BulkAdd(index_name, type_name, id string, data []interface{}) (result bool) {
-	result = false
+// BulkAdd 批量新增
+func (es *MyElastic) BulkAdd(data []interface{}, id ...string) (err error) {
 	// Index a tweet (using JSON serialization)
-	bulkRequest := es.Client.Bulk()
+	bulkRequest := es.client.Bulk()
 	if len(id) > 0 {
 		for _, doc := range data {
 			esRequest := elastic.NewBulkIndexRequest().
-				Index(index_name).
-				Type(type_name).
-				Id(id).Doc(doc)
+				Index(es.ops.indexName).
+				Type(es.ops.typeName).
+				Id(id[0]).Doc(doc)
 			bulkRequest = bulkRequest.Add(esRequest)
 		}
 	} else {
 		for _, doc := range data {
 			esRequest := elastic.NewBulkIndexRequest().
-				Index(index_name).
-				Type(type_name).
+				Index(es.ops.indexName).
+				Type(es.ops.typeName).
 				Doc(doc)
 			bulkRequest = bulkRequest.Add(esRequest)
 		}
 	}
 
-	_, es.Err = bulkRequest.Do(es.Ctx)
-	if es.Err != nil {
-		log.Println(es.Err)
-		return false
+	_, err = bulkRequest.Do(es.ops.ctx)
+	if err != nil {
+		mylog.Error(err)
+		return err
 	}
-	_, es.Err = es.Client.Flush().Index(index_name).Do(es.Ctx)
-	if es.Err != nil {
-		log.Println(es.Err)
-		return false
+	_, err = es.client.Flush().Index(es.ops.indexName).Do(es.ops.ctx)
+	if err != nil {
+		mylog.Error(err)
+		return err
 	}
-	return true
+	return nil
 
 }
 
-/*
-添加记录,覆盖添加
-index_name
-type_name
-query interface{} //查询条件
-out *[]Param //查询结果
-*/
-func (es *MyElastic) SearchMap(index_name, type_name string, query interface{}, out *[]map[string]interface{}) (result bool) {
-	es_search := es.Client.Search()
-	if len(type_name) > 0 {
-		es_search = es_search.Type(type_name)
+// SearchMap 添加记录,覆盖添加 index_name type_name query interface{} //查询条件 out *[]Param //查询结果
+func (es *MyElastic) SearchMap(query interface{}) (out []map[string]interface{}, err error) {
+	es_search := es.client.Search()
+	if len(es.ops.typeName) > 0 {
+		es_search = es_search.Type(es.ops.typeName)
 	}
-	if len(index_name) > 0 {
-		es_search = es_search.Index(index_name)
-	}
-	var es_result *elastic.SearchResult
-	es_result, es.Err = es_search.Source(query).Do(es.Ctx)
-	if es.Err != nil {
-		log.Println(es.Err)
-		return false
-	}
-	if es_result.Hits == nil {
-		log.Println(errors.New("expected SearchResult.Hits != nil; got nil"))
-		return false
+	if len(es.ops.indexName) > 0 {
+		es_search = es_search.Index(es.ops.indexName)
 	}
 
-	for _, hit := range es_result.Hits.Hits {
+	esResult, err := es_search.Source(query).Do(es.ops.ctx)
+	if err != nil {
+		mylog.Error(err)
+		return nil, err
+	}
+	if esResult.Hits == nil {
+		return nil, errors.New("expected SearchResult.Hits != nil; got nil")
+	}
+	for _, hit := range esResult.Hits.Hits {
 		tmp := make(map[string]interface{})
-		err := json.Unmarshal(*hit.Source, &tmp)
+		err := json.Unmarshal(hit.Source, &tmp)
 		if err != nil {
-			log.Println(es.Err)
+			mylog.Error(err)
 		} else {
-			*out = append(*out, tmp)
+			out = append(out, tmp)
 		}
 	}
 
-	return true
+	return out, nil
 }
 
-/*
-添加记录,覆盖添加
-index_name
-type_name
-query interface{} //查询条件
-out *[]Param //查询结果
-*/
-func (es *MyElastic) Search(index_name, type_name string, query interface{}, f func(e []byte) error) (total int64, result bool) {
+// Search 自定义搜索结果
+func (es *MyElastic) Search(query interface{}, f func(e []byte) error) (total int64, err error) {
 
-	es_search := es.Client.Search()
-	if len(type_name) > 0 {
-		es_search = es_search.Type(type_name)
+	es_search := es.client.Search()
+	if len(es.ops.typeName) > 0 {
+		es_search = es_search.Type(es.ops.typeName)
 	}
-	if len(index_name) > 0 {
-		es_search = es_search.Index(index_name)
-	}
-	var es_result *elastic.SearchResult
-	es_result, es.Err = es_search.Source(query).Do(es.Ctx)
-	if es.Err != nil {
-		log.Println(es.Err)
-		return 0, false
-	}
-	if es_result.Hits == nil {
-		log.Println(errors.New("expected SearchResult.Hits != nil; got nil"))
-		return 0, false
+	if len(es.ops.indexName) > 0 {
+		es_search = es_search.Index(es.ops.indexName)
 	}
 
-	for _, hit := range es_result.Hits.Hits {
-		f(*hit.Source) //如果 inmprt github.com/olivere/elastic 需要去掉 *
+	esResult, err := es_search.Source(query).Do(es.ops.ctx)
+	if err != nil {
+		mylog.Error(err)
+		return 0, err
+	}
+	if esResult.Hits == nil {
+		return 0, errors.New("expected SearchResult.Hits != nil; got nil")
 	}
 
-	return es_result.TotalHits(), true
+	for _, hit := range esResult.Hits.Hits {
+		f(hit.Source) //如果 inmprt github.com/olivere/elastic 需要去掉 *
+	}
+
+	return esResult.TotalHits(), nil
 }

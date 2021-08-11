@@ -11,10 +11,10 @@ import (
 )
 
 func TestEsAdd(m *testing.T) {
-	//Url := "http://192.168.198.17:9200/"
-	Index := "ezbuy_wms_log"
+	url := "http://192.168.198.17:9200/"
+	Index := "xxj_wms_log"
 
-	es := GetClient()
+	es, _ := New(WithIndexName(Index), WithAddrs(url))
 
 	var eslog ESLog
 	eslog.Topic = "topic"
@@ -33,9 +33,9 @@ func TestEsAdd(m *testing.T) {
 		tmp = append(tmp, eslog)
 	}
 
-	b := es.BulkAdd(Index, Index, "", tmp)
-	if !b {
-		fmt.Println(es.Err)
+	err := es.BulkAdd(tmp)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	// var eslogs []ESLog
@@ -46,10 +46,10 @@ func TestEsAdd(m *testing.T) {
 }
 
 func TestSearch(t *testing.T) {
-	// Url := "http://192.168.198.17:9200/"
-	Index := "ezbuy_wms_log"
+	url := "http://192.168.198.17:9200/"
+	Index := "xxj_wms_log"
 
-	es := GetClient()
+	es, _ := New(WithIndexName(Index), WithAddrs(url))
 
 	// var ws []map[string]interface{}
 	// b := es.SearchMap(config.Config.ElasticSearch.Index,
@@ -113,7 +113,7 @@ func TestSearch(t *testing.T) {
 	//query := elastic.NewSearchSource().Query(elastic.NewMatchAllQuery()).From(0).Size(1)
 	//`{"query":{"match_all":{}}}`
 	var eslog []ESLog
-	es.Search(Index, Index, source, func(e []byte) error {
+	es.WithOption(WithIndexName(Index), WithTypeName(Index)).Search(source, func(e []byte) error {
 		var tmp ESLog
 		err := json.Unmarshal(e, &tmp)
 		if err != nil {
@@ -132,8 +132,8 @@ func TestSearch(t *testing.T) {
 }
 
 func TestSearchObj(t *testing.T) {
-	// Url := "http://192.168.198.17:9200/"
-	Index := "ezbuy_wms_log"
+	url := "http://192.168.198.17:9200/"
+	Index := "xxj_wms_log"
 
 	parm := make(map[string]interface{})
 	parm["itype"] = 666
@@ -150,9 +150,9 @@ func TestSearchObj(t *testing.T) {
 	data1, _ := json.Marshal(que.OnSource())
 	fmt.Println(string(data1))
 
-	es := GetClient()
+	es, _ := New(WithIndexName(Index), WithAddrs(url))
 	var eslog []ESLog
-	es.Search(Index, Index, que.OnSource(), func(e []byte) error {
+	es.WithOption(WithIndexName(Index), WithTypeName(Index)).Search(que.OnSource(), func(e []byte) error {
 		var tmp ESLog
 		err := json.Unmarshal(e, &tmp)
 		if err != nil {
@@ -171,8 +171,8 @@ func TestSearchObj(t *testing.T) {
 }
 
 func TestTrackingOpLoger(t *testing.T) {
-	// Url := "http://192.168.198.17:9200/"
-	Index := "ezbuy_wms_log"
+	url := "http://192.168.198.17:9200/"
+	Index := "xxj_wms_log"
 
 	//精确搜索
 	term := make(map[string]interface{})
@@ -198,19 +198,18 @@ func TestTrackingOpLoger(t *testing.T) {
 	data1, _ := json.Marshal(que.OnSource())
 	fmt.Println(string(data1))
 
-	client := GetClient()
+	client, _ := New(WithIndexName(Index), WithAddrs(url))
 	var eslog []ESLog
-	client.Search(Index, Index,
-		que.OnSource(), func(e []byte) error {
-			var tmp ESLog
-			err := json.Unmarshal(e, &tmp)
-			if err != nil {
-				log.Println(err)
-			} else {
-				eslog = append(eslog, tmp)
-			}
-			return err
-		})
+	client.WithOption(WithIndexName(Index), WithTypeName(Index)).Search(que.OnSource(), func(e []byte) error {
+		var tmp ESLog
+		err := json.Unmarshal(e, &tmp)
+		if err != nil {
+			log.Println(err)
+		} else {
+			eslog = append(eslog, tmp)
+		}
+		return err
+	})
 
 	fmt.Println(eslog)
 }
