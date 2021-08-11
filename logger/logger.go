@@ -15,10 +15,8 @@ type Logger struct {
 
 //添加一个日志
 func (s *Logger) AddLog() {
-	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "wms_log"
 
-	e := es.GetClient()
+	e, _ := es.New(es.WithIndexName("wms_log"), es.WithAddrs("http://192.168.198.17:9200/"))
 
 	var eslog es.ESLog
 	eslog.Topic = "topic"
@@ -37,16 +35,16 @@ func (s *Logger) AddLog() {
 		tmp = append(tmp, eslog)
 	}
 
-	b := e.BulkAdd(es.Index, es.Index, "", tmp)
-	if !b {
-		fmt.Println(e.Err)
+	err := e.BulkAdd(tmp)
+	if err != nil {
+		fmt.Println(err)
 	}
 }
 
 //搜索日志
 func (s *Logger) Search() {
-	es.Url = "http://192.168.198.17:9200/"
-	es.Index = "wms_log"
+	url := "http://192.168.198.17:9200/"
+	index := "wms_log"
 
 	//精确搜索
 	term := make(map[string]interface{})
@@ -72,19 +70,18 @@ func (s *Logger) Search() {
 	data1, _ := json.Marshal(que.OnSource())
 	fmt.Println(string(data1))
 
-	client := es.GetClient()
+	client, _ := es.New(es.WithIndexName(index), es.WithAddrs(url))
 	var eslog []es.ESLog
-	client.Search(es.Index, es.Index,
-		que.OnSource(), func(e []byte) error {
-			var tmp es.ESLog
-			err := json.Unmarshal(e, &tmp)
-			if err != nil {
-				log.Println(err)
-			} else {
-				eslog = append(eslog, tmp)
-			}
-			return err
-		})
+	client.Search(que.OnSource(), func(e []byte) error {
+		var tmp es.ESLog
+		err := json.Unmarshal(e, &tmp)
+		if err != nil {
+			log.Println(err)
+		} else {
+			eslog = append(eslog, tmp)
+		}
+		return err
+	})
 
 	fmt.Println(eslog)
 }
