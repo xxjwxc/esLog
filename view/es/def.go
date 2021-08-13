@@ -69,7 +69,7 @@ const mapping = `
 				"store": true,
 				"fielddata": true
 			},
-			"creat_time":{
+			"create_time":{
 				"type":"date"
 			}
 		}
