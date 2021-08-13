@@ -24,7 +24,7 @@ func TestEsAdd(m *testing.T) {
 	eslog.ELevel = oplogger.ELogLevel_EOperate
 	eslog.Desc = "desc yes haha oye"
 	eslog.Attach = "attach"
-	eslog.CreatTime = time.Now()
+	eslog.CreateTime = time.Now()
 
 	var tmp []interface{}
 	for i := 0; i < 3; i++ {
@@ -125,7 +125,7 @@ func TestSearch(t *testing.T) {
 	})
 
 	for _, v := range eslog {
-		fmt.Println(v.CreatTime)
+		fmt.Println(v.CreateTime)
 		fmt.Println("-----------------")
 	}
 
@@ -164,7 +164,7 @@ func TestSearchObj(t *testing.T) {
 	})
 
 	for _, v := range eslog {
-		fmt.Println(v.CreatTime)
+		fmt.Println(v.CreateTime)
 		fmt.Println("-----------------")
 	}
 

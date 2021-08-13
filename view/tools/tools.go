@@ -14,14 +14,14 @@ func ConvertRe2ESLog(req []*oplogger.LogerInfo) []es.ESLog {
 	resp := make([]es.ESLog, 0, len(req))
 	for _, v := range req {
 		resp = append(resp, es.ESLog{
-			Topic:     v.Topic,
-			EType:     v.EType,
-			UserName:  v.UserName,
-			Ekey:      v.Ekey,
-			ELevel:    v.ELevel,
-			Desc:      v.Desc,
-			Attach:    v.Attach,
-			CreatTime: time.Unix(v.CreatTime, 0),
+			Topic:      v.Topic,
+			EType:      v.EType,
+			UserName:   v.UserName,
+			Ekey:       v.Ekey,
+			ELevel:     v.ELevel,
+			Desc:       v.Desc,
+			Attach:     v.Attach,
+			CreateTime: time.Unix(v.CreatTime, 0),
 		})
 	}
 
@@ -40,7 +40,7 @@ func ConvertESLogS2Re(req []es.ESLog) []*oplogger.LogerInfo {
 			ELevel:    v.ELevel,
 			Desc:      v.Desc,
 			Attach:    v.Attach,
-			CreatTime: v.CreatTime.Unix(),
+			CreatTime: v.CreateTime.Unix(),
 		})
 	}
 

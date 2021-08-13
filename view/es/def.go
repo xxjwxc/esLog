@@ -33,7 +33,7 @@ type ESLog struct {
 	Attach string `json:"attach"`
 
 	//创建时间
-	CreatTime time.Time `json:"creat_time"`
+	CreateTime time.Time `json:"create_time"`
 }
 
 const mapping = `
@@ -43,36 +43,34 @@ const mapping = `
 		"number_of_replicas": 0
 	},
 	"mappings":{
-		"oplogger":{
-			"properties":{
-				"topic":{
-					"type":"keyword"
-				},
-				"user_name":{
-					"type":"keyword"
-				},
-				"etype":{
-					"type":"keyword"
-				},
-				"ekey":{
-					"type":"keyword"
-				},
-				"elevel":{
-					"type":"keyword"
-				},
-				"desc":{
-					"type":"text",
-					"store": true,
-					"fielddata": true
-				},
-				"attach":{
-					"type":"text",
-					"store": true,
-					"fielddata": true
-				},
-				"creat_time":{
-					"type":"date"
-				}
+		"properties":{
+			"topic":{
+				"type":"keyword"
+			},
+			"user_name":{
+				"type":"keyword"
+			},
+			"etype":{
+				"type":"keyword"
+			},
+			"ekey":{
+				"type":"keyword"
+			},
+			"elevel":{
+				"type":"keyword"
+			},
+			"desc":{
+				"type":"text",
+				"store": true,
+				"fielddata": true
+			},
+			"attach":{
+				"type":"text",
+				"store": true,
+				"fielddata": true
+			},
+			"creat_time":{
+				"type":"date"
 			}
 		}
 	}
