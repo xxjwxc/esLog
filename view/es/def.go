@@ -15,6 +15,7 @@ var once sync.Once
 const retry = 3 //链接重试次数
 //const PAGE_MAX_NUM = 10 //每页显示数据量
 
+// ESLog ...
 type ESLog struct {
 	//应用/服务的标识： 用来确定日志产生的应用服务器的唯一标识(可以细分)
 	Topic string `json:"topic"`
@@ -34,6 +35,27 @@ type ESLog struct {
 
 	//创建时间
 	CreateTime time.Time `json:"create_time"`
+}
+
+// ESLogColumns 应用列名
+var ESLogColumns = struct {
+	Topic      string
+	EType      string
+	UserName   string
+	Ekey       string
+	ELevel     string
+	Desc       string
+	Attach     string
+	CreateTime string
+}{
+	Topic:      "topic",
+	EType:      "etype",
+	UserName:   "user_name",
+	Ekey:       "ekey",
+	ELevel:     "elevel",
+	Desc:       "desc",
+	Attach:     "attach",
+	CreateTime: "create_time",
 }
 
 const mapping = `

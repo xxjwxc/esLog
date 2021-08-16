@@ -69,6 +69,13 @@ func (es *MyElastic) WithOption(opts ...Option) *MyElastic {
 	return es
 }
 
+// func (es *MyElastic) Ping() error {
+// 	info, code, err := es.client.Ping(host).Do(context.Background())
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
+
 // CreateIndex 创建索引（相当于数据库）.mapping 如果为空("")则表示不创建模型
 func (es *MyElastic) CreateIndex(mapping string) error {
 	exists, err := es.GetClient().IndexExists(es.ops.indexName).Do(es.ops.ctx)
