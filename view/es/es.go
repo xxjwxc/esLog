@@ -71,7 +71,7 @@ func (es *MyElastic) WithOption(opts ...Option) *MyElastic {
 
 // CreateIndex 创建索引（相当于数据库）.mapping 如果为空("")则表示不创建模型
 func (es *MyElastic) CreateIndex(mapping string) error {
-	exists, err := es.client.IndexExists(es.ops.indexName).Do(es.ops.ctx)
+	exists, err := es.GetClient().IndexExists(es.ops.indexName).Do(es.ops.ctx)
 	if err != nil {
 		mylog.Error(err)
 		return err
@@ -80,9 +80,9 @@ func (es *MyElastic) CreateIndex(mapping string) error {
 	if !exists {
 		var re *elastic.IndicesCreateResult
 		if len(mapping) == 0 {
-			re, err = es.client.CreateIndex(es.ops.indexName).Do(es.ops.ctx)
+			re, err = es.GetClient().CreateIndex(es.ops.indexName).Do(es.ops.ctx)
 		} else {
-			re, err = es.client.CreateIndex(es.ops.indexName).BodyString(mapping).Do(es.ops.ctx)
+			re, err = es.GetClient().CreateIndex(es.ops.indexName).BodyString(mapping).Do(es.ops.ctx)
 		}
 
 		if err != nil {
@@ -100,7 +100,7 @@ func (es *MyElastic) CreateIndex(mapping string) error {
 
 // SortQuery 排序查询,返回json数据集合
 func (es *MyElastic) SortQuery(builder []elastic.Sorter, query []elastic.Query) ([]string, error) {
-	searchResult := es.client.Search().Index(es.ops.indexName)
+	searchResult := es.GetClient().Search().Index(es.ops.indexName)
 
 	if len(builder) > 0 {
 		for _, v := range builder {
@@ -133,7 +133,7 @@ func (es *MyElastic) SortQuery(builder []elastic.Sorter, query []elastic.Query) 
 
 // SortQueryReturnHits  排序查询  返回原始Hit(builder：排序 agg：聚合 类似group_by sum,query：查询)
 func (es *MyElastic) SortQueryReturnHits(from, size int, builder []elastic.Sorter, query []elastic.Query) ([]*elastic.SearchHit, error) {
-	searchResult := es.client.Search().Index(es.ops.indexName)
+	searchResult := es.GetClient().Search().Index(es.ops.indexName)
 	if len(builder) > 0 {
 		for _, v := range builder {
 			searchResult = searchResult.SortBy(v)
@@ -166,14 +166,14 @@ func (es *MyElastic) SortQueryReturnHits(from, size int, builder []elastic.Sorte
 func (es *MyElastic) Add(data interface{}, id ...string) (err error) {
 	// Index a tweet (using JSON serialization)
 	if len(id) > 0 {
-		_, err = es.client.Index().
+		_, err = es.GetClient().Index().
 			Index(es.ops.indexName).
 			Type(es.ops.typeName).
 			Id(id[0]).
 			BodyJson(data).
 			Do(es.ops.ctx)
 	} else {
-		_, err = es.client.Index().
+		_, err = es.GetClient().Index().
 			Index(es.ops.indexName).
 			Type(es.ops.typeName).
 			BodyJson(data).
@@ -184,7 +184,7 @@ func (es *MyElastic) Add(data interface{}, id ...string) (err error) {
 		mylog.Error(err)
 		return err
 	}
-	_, err = es.client.Flush().Index(es.ops.indexName).Do(es.ops.ctx)
+	_, err = es.GetClient().Flush().Index(es.ops.indexName).Do(es.ops.ctx)
 	if err != nil {
 		mylog.Error(err)
 		return err
@@ -195,7 +195,7 @@ func (es *MyElastic) Add(data interface{}, id ...string) (err error) {
 // BulkAdd 批量新增
 func (es *MyElastic) BulkAdd(data []interface{}, id ...string) (err error) {
 	// Index a tweet (using JSON serialization)
-	bulkRequest := es.client.Bulk()
+	bulkRequest := es.GetClient().Bulk()
 	if len(id) > 0 {
 		for _, doc := range data {
 			esRequest := elastic.NewBulkIndexRequest().
@@ -219,7 +219,7 @@ func (es *MyElastic) BulkAdd(data []interface{}, id ...string) (err error) {
 		mylog.Error(err)
 		return err
 	}
-	_, err = es.client.Flush().Index(es.ops.indexName).Do(es.ops.ctx)
+	_, err = es.GetClient().Flush().Index(es.ops.indexName).Do(es.ops.ctx)
 	if err != nil {
 		mylog.Error(err)
 		return err
@@ -230,7 +230,7 @@ func (es *MyElastic) BulkAdd(data []interface{}, id ...string) (err error) {
 
 // SearchMap 添加记录,覆盖添加 index_name type_name query interface{} //查询条件 out *[]Param //查询结果
 func (es *MyElastic) SearchMap(query interface{}) (out []map[string]interface{}, err error) {
-	es_search := es.client.Search()
+	es_search := es.GetClient().Search()
 	if len(es.ops.typeName) > 0 {
 		es_search = es_search.Type(es.ops.typeName)
 	}
@@ -262,7 +262,7 @@ func (es *MyElastic) SearchMap(query interface{}) (out []map[string]interface{},
 // Search 自定义搜索结果
 func (es *MyElastic) Search(query interface{}, f func(e []byte) error) (total int64, err error) {
 
-	es_search := es.client.Search()
+	es_search := es.GetClient().Search()
 	if len(es.ops.typeName) > 0 {
 		es_search = es_search.Type(es.ops.typeName)
 	}
