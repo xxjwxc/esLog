@@ -19,7 +19,7 @@ type ESLog struct {
 	//应用/服务的标识： 用来确定日志产生的应用服务器的唯一标识(可以细分)
 	Topic string `json:"topic"`
 	//业务唯一标识
-	EType oplogger.EOpType `json:"etype"`
+	EType int32 `json:"etype"`
 	//用户信息
 	UserName string `json:"user_name"`
 	//关键值

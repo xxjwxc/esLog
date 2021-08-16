@@ -10,7 +10,7 @@ import (
 func IsEmpty(req []*oplogger.LogerInfo) bool {
 	for _, v := range req {
 		if CheckParam(v.Topic, v.UserName, v.Ekey, v.Desc, v.Attach) ||
-			v.EType != oplogger.EOpType_EOpDefault || v.ELevel != oplogger.ELogLevel_EDefault || v.CreatTime != 0 {
+			v.EType != 0 || v.ELevel != oplogger.ELogLevel_EDefault || v.CreatTime != 0 {
 			return false
 		}
 	}

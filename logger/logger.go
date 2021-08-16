@@ -20,13 +20,13 @@ func (s *Logger) AddLog() {
 
 	var eslog es.ESLog
 	eslog.Topic = "topic"
-	eslog.EType = oplogger.EOpType_EOpGunbuster
+	eslog.EType = 1
 	eslog.UserName = "username"
 	eslog.Ekey = "iddd"
 	eslog.ELevel = oplogger.ELogLevel_EOperate
 	eslog.Desc = "desc yes haha oye"
 	eslog.Attach = "attach"
-	eslog.CreatTime = time.Now()
+	eslog.CreateTime = time.Now()
 
 	var tmp []interface{}
 	for i := 0; i < 3; i++ {
@@ -49,7 +49,7 @@ func (s *Logger) Search() {
 	//精确搜索
 	term := make(map[string]interface{})
 	term["topic"] = "topic"
-	term["etype"] = oplogger.EOpType_EOpGunbuster
+	term["etype"] = 1
 	term["user_name"] = "username"
 	term["ekey"] = "iddd-1"
 	term["elevel"] = oplogger.ELogLevel_EOperate

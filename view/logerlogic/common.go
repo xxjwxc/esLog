@@ -10,7 +10,7 @@ type LogerInfo struct {
 	Loger oplogger.LogerInfo
 }
 
-func (b *LogerInfo) CreatLoger(e oplogger.EOpType, topic string) *LogerInfo {
+func (b *LogerInfo) CreatLoger(e int32, topic string) *LogerInfo {
 	//业务唯一标识
 	b.Loger.EType = e
 	b.Loger.Topic = topic
