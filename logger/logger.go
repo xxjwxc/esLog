@@ -59,7 +59,7 @@ func (s *Logger) Search() {
 	match["attach"] = "attach"
 
 	timeCase := make(map[string]es.CaseSection)
-	timeCase["creat_time"] = es.CaseSection{
+	timeCase["create_time"] = es.CaseSection{
 		Min: time.Now().AddDate(0, 0, -10),
 		Max: time.Now(),
 	}

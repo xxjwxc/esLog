@@ -65,5 +65,5 @@ type LogerInfo struct {
 	Attach string `json:"attach"`
 
 	//创建时间
-	CreatTime int64 `json:"creat_time"`
+	CreatTime int64 `json:"create_time"`
 }

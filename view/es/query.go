@@ -78,9 +78,9 @@ func (q *EsQuery) OnSource() map[string]interface{} {
 
 	if len(q.much_term) == 0 {
 		return map[string]interface{}{
-			"from":       q.offset,
-			"size":       q.limit,
-			"creat_time": "desc", //默认时间降序
+			"from":        q.offset,
+			"size":        q.limit,
+			"create_time": "desc", //默认时间降序
 		}
 	}
 
@@ -93,7 +93,7 @@ func (q *EsQuery) OnSource() map[string]interface{} {
 		"from": q.offset,
 		"size": q.limit,
 		"sort": map[string]interface{}{
-			"creat_time": "desc",
+			"create_time": "desc",
 		}, //默认时间降序
 	}
 }

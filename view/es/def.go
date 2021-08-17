@@ -126,7 +126,7 @@ type CaseSection struct {
 // 	//时间列表
 // 	BeginTime time.Time `json:"begin_time"`
 // 	EndTime   time.Time `json:"end_time"`
-// 	CreatTime time.Time `json:"creat_time"`
+// 	CreatTime time.Time `json:"create_time"`
 
 // 	//事件列表，描述
 // 	ELevel oplogger.ELogLevel `json:"elevel"`
@@ -194,7 +194,7 @@ type CaseSection struct {
 // 				"end_time":{
 // 					"type":"date"
 // 				},
-// 				"creat_time":{
+// 				"create_time":{
 // 					"type":"date"
 // 				},
 // 				"elevel":{

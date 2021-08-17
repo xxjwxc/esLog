@@ -64,7 +64,7 @@ func TestSearch(t *testing.T) {
 		"from": 0,
 		"size": 10,
 		"sort": map[string]interface{}{
-			"creat_time": "desc",
+			"create_time": "desc",
 		},
 		"query": map[string]interface{}{
 			"filtered": map[string]interface{}{
@@ -88,7 +88,7 @@ func TestSearch(t *testing.T) {
 					"and": []interface{}{
 						map[string]interface{}{
 							"range": map[string]interface{}{
-								"creat_time": map[string]interface{}{
+								"create_time": map[string]interface{}{
 									"gte": time.Now().AddDate(0, 0, -1),
 									"lte": time.Now(),
 								},
@@ -140,7 +140,7 @@ func TestSearchObj(t *testing.T) {
 	parm["dint"] = 456
 
 	timecase := make(map[string]CaseSection)
-	timecase["creat_time"] = CaseSection{
+	timecase["create_time"] = CaseSection{
 		Min: time.Now().Unix(),
 		Max: time.Now().AddDate(0, 0, -2).Unix(),
 	}
@@ -187,7 +187,7 @@ func TestTrackingOpLoger(t *testing.T) {
 	match["attach"] = "attach"
 
 	timeCase := make(map[string]CaseSection)
-	timeCase["creat_time"] = CaseSection{
+	timeCase["create_time"] = CaseSection{
 		Min: time.Now().AddDate(0, 0, -1),
 		Max: time.Now(),
 	}
