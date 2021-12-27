@@ -186,6 +186,10 @@ func TestTrackingOpLoger(t *testing.T) {
 	match["desc"] = "desc"
 	match["attach"] = "attach"
 
+	wildcard := make(map[string]interface{})
+	wildcard["desc"] = "*desc*"
+	wildcard["attach"] = "*attach*"
+
 	timeCase := make(map[string]CaseSection)
 	timeCase["create_time"] = CaseSection{
 		Min: time.Now().AddDate(0, 0, -1),
@@ -194,7 +198,7 @@ func TestTrackingOpLoger(t *testing.T) {
 
 	//构造搜索器
 	var que EsQuery
-	que.OnPages(0, 10).OnTerm(term).OnMatch(match).OnRangeTime(timeCase)
+	que.OnPages(0, 10).OnTerm(term).OnMatch(match).OnWildcard(wildcard).OnRangeTime(timeCase)
 	data1, _ := json.Marshal(que.OnSource())
 	fmt.Println(string(data1))
 

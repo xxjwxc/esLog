@@ -54,6 +54,23 @@ func (q *EsQuery) OnMatch(parm map[string]interface{}) *EsQuery {
 	return q
 }
 
+//模糊匹配
+func (q *EsQuery) OnWildcard(parm map[string]interface{}) *EsQuery {
+	if len(parm) == 0 {
+		return q
+	}
+
+	for k, v := range parm {
+		mp := make(map[string]interface{})
+		mp[k] = v
+		q.much_term = append(q.much_term, map[string]interface{}{
+			"wildcard": mp,
+		})
+	}
+
+	return q
+}
+
 //区间<oplogger.TimeSection{BeginTime,EndTime}	>
 func (q *EsQuery) OnRangeTime(timeCase map[string]CaseSection) *EsQuery {
 	if timeCase == nil || len(timeCase) == 0 {
