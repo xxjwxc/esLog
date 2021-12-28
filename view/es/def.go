@@ -89,7 +89,7 @@ const mapping = `
 					  "ignore_above": 256
 					}
 				},
-				"analyzer": "ik_smart",		  
+				"analyzer": "standard",		  
 				"store": true,
 				"fielddata": true
 			},
