@@ -83,6 +83,13 @@ const mapping = `
 			},
 			"desc":{
 				"type":"text",
+				"fields": {
+					"keyword": {
+					  "type": "keyword",
+					  "ignore_above": 256
+					}
+				},
+				"analyzer": "ik_smart",		  
 				"store": true,
 				"fielddata": true
 			},
