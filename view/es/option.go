@@ -16,6 +16,7 @@ type options struct {
 
 	indexName string
 	typeName  string
+	mapping   string
 	addrs     []string
 	ctx       context.Context
 }
@@ -73,7 +74,13 @@ func WithTimeout(t time.Duration) Option {
 	})
 }
 
-//
+// WithMapping 设置索引
+func WithMapping(mapping string) Option {
+	return optionFunc(func(o *options) {
+		o.mapping = mapping
+	})
+}
+
 func (es *MyElastic) newClient() error {
 	var err error
 

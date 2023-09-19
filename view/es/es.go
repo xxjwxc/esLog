@@ -36,7 +36,12 @@ func New(opts ...Option) (*MyElastic, error) {
 	if err != nil {
 		return nil, err
 	}
-	es.CreateIndex(mapping)
+
+	_mapping := mapping
+	if len(es.ops.mapping) > 0 {
+		_mapping = es.ops.mapping
+	}
+	es.CreateIndex(_mapping)
 
 	return es, nil
 }
